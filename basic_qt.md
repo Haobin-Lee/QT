@@ -214,3 +214,67 @@ setCentralWidget(edit);
 4. 右键res.qrc->open in editor 编辑资源
 5. 添加前缀 添加文件
 6. 使用 ": + 前缀名 + 文件名"
+
+## 事件
+
+### 鼠标事件
+
+```cpp
+    //鼠标进入事件
+    virtual void enterEvent(QEvent *event);
+    //鼠标离开事件
+    virtual void leaveEvent(QEvent *event);
+    //鼠标按下
+    virtual void mouseReleaseEvent(QMouseEvent *ev);
+    //鼠标释放
+    virtual void mousePressEvent(QMouseEvent *ev);
+    //鼠标移动,如果要识别是哪个鼠标移动，则需要使用ev -> buttons() & Qt::LeftButton,追踪鼠标状态也可以使用setMouseTracking(true)
+    virtual void mouseMoveEvent(QMouseEvent *ev);
+
+        ev->x(),ev->y() -- 打印坐标信息
+        ev->button() -- 判断左右键 Qt::LeftButton 和 Qt::RightButton
+        ev->buttons() -- 判断组合按键，按键的同时move 结合&操作符
+```
+
+### 定时器事件
+
+```cpp
+//通过事件启动定时器
+    //启动定时器事件
+    startTimer(1000); //启动定时器，单位毫秒，返回一个唯一定时器id，每1000毫秒启动一次定时器，即每1000毫秒调用一次timerEvent()函数
+    
+    //定时器事件,可以通过ev->timerId()== id1来判断当前是哪个id进来的
+    void timerEvent(QTimerEvent * ev); 
+
+//通过定时器类QTimer
+    QTimer * timer = new QTimer(this);
+    //启动定时器 每隔500秒发一个信号
+    timer->start(500);
+    //连接信号
+    connect(timer,&QTimer::timeout,[=](){
+        static int num = 1;
+        ui->label_5->setText(QString::number(num++));
+    });
+    //暂停
+    timer -> stop();
+```
+
+### 事件分发器
+
+```cpp
+    //返回值是bool类型，如果返回true，代表用户要处理这个事件,不向下分发事件了[类似于钩子]
+    bool event(QEvent * ev)
+    //事件枚举QEvent
+    ev.type();//返回事件类型
+    //拦截后，比如与 ev.type() 相匹配
+    QMouseEvent *ev = static_cast<QMouseEvent *>('QEvent中的形参');
+```
+
+### 事件过滤器
+
+![对象树](./imgs/对象树.png)
+
+在程序事件分发到事件分发器前，可以利用过滤器做拦截
+
+1. 给控件安装事件过滤器 `ui->label->installEventFilter(this)`--表示`this`给`ui->label`安装过滤器
+2. 重写`eventFilter(QObject obj, QEvent e)`函数 -- `obj`将传入安装过滤器的目标对象，例如上面的`ui->label`，`e`将传入目标事件，例如`QEvent::MouseButtonPress`
