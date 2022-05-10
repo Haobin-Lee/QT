@@ -276,5 +276,6 @@ setCentralWidget(edit);
 
 在程序事件分发到事件分发器前，可以利用过滤器做拦截
 
-1. 给控件安装事件过滤器 `ui->label->installEventFilter(this)`--表示`this`给`ui->label`安装过滤器
-2. 重写`eventFilter(QObject obj, QEvent e)`函数 -- `obj`将传入安装过滤器的目标对象，例如上面的`ui->label`，`e`将传入目标事件，例如`QEvent::MouseButtonPress`
+1. 给控件安装事件过滤器 `ui->label->installEventFilter(this)`--表示`this`给`ui->label`安装过滤器。
+2. 重写`eventFilter(QObject obj, QEvent e)`函数 -- `obj`将传入安装过滤器的目标对象，例如上面的`ui->label`，`e`将传入目标事件，例如`QEvent::MouseButtonPress`。
+3. `return true`表示用户自己处理事件，不向下分发。其他交给父类的默认`enventFilter`，即`return QWidget::eventFilter(obj, e);`，如果父类是`QWidget`。
